@@ -17,3 +17,5 @@ wails3 build   # production binary in bin/
 ```
 
 Requires Go, Bun, and the `wails3` CLI.
+
+Pinning a tag (`...-ts@v1.0.0`) works, but wails3 v3.0.0 then detects TypeScript by the `-ts` URL suffix and falls back to JS bindings. Unpinned URL gives TS bindings.
