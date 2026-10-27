@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=https://v3.wails.io/schemas/template.v3.json
+name: "SvelteKit + Tailwind + Skeleton (TypeScript, Bun)"
+shortname: sveltekit-ts
+author: Jess4da
+description: "SvelteKit SPA (adapter-static) + Tailwind CSS v4 + Skeleton UI + Lucide icons, managed with Bun"
+helpurl: https://github.com/Jess4da/wails3-sveltekit-ts
+version: v1.0.0
+wailsVersion: 3
+typescript: true

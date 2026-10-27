@@ -1,0 +1,71 @@
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import { Events, WML } from '@wailsio/runtime';
+  import { User, ArrowRight, Clock, ExternalLink } from '@lucide/svelte';
+  import { GreetService } from '../../bindings/{{js .ModulePath}}';
+
+  const wailsVersion = '{{.WailsVersion}}';
+
+  let name = $state('');
+  let greeted = $state('SvelteKit');
+  let time = $state('Listening for Time event...');
+  let toast = $state('');
+  let toastTimer: ReturnType<typeof setTimeout>;
+
+  onMount(() => {
+    const off = Events.On('time', (e: { data: string }) => (time = e.data));
+    // Wire up data-wml-openURL links.
+    WML.Reload();
+    return off;
+  });
+
+  async function greet() {
+    greeted = name || 'anonymous';
+    try {
+      toast = await GreetService.Greet(greeted);
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => (toast = ''), 4000);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+</script>
+
+<div class="flex min-h-screen flex-col">
+  <main class="flex flex-1 flex-col items-center justify-center gap-6 p-8 text-center">
+    <div class="flex items-center gap-4">
+      <button type="button" class="cursor-pointer" data-wml-openURL="https://v3.wails.io">
+        <img src="/wails.png" class="size-16" alt="Wails logo" />
+      </button>
+      <button type="button" class="cursor-pointer" data-wml-openURL="https://svelte.dev">
+        <img src="/svelte.svg" class="size-14" alt="Svelte logo" />
+      </button>
+    </div>
+
+    <h1 class="h1"><span class="text-primary-500">Wails +</span> {greeted}</h1>
+    <p class="opacity-70">Build beautiful cross-platform apps with Go and SvelteKit.</p>
+
+    <form class="field-group w-full max-w-md grid-cols-[auto_1fr_auto]" onsubmit={(e) => { e.preventDefault(); greet(); }}>
+      <div class="label preset-tonal"><User class="size-4" /></div>
+      <input class="input" aria-label="input" bind:value={name} type="text" placeholder="Your name" autocomplete="off" />
+      <button class="btn preset-filled-primary-500" aria-label="greet-btn" type="submit">
+        Greet <ArrowRight class="size-4" />
+      </button>
+    </form>
+  </main>
+
+  <footer class="flex items-center justify-between border-t border-surface-200-800 px-6 py-3 text-sm opacity-80">
+    <span class="badge preset-tonal">{wailsVersion}</span>
+    <span class="flex items-center gap-2"><Clock class="size-4" />{time}</span>
+    <button type="button" class="anchor flex cursor-pointer items-center gap-1" data-wml-openURL="https://v3.wails.io">
+      Docs <ExternalLink class="size-4" />
+    </button>
+  </footer>
+</div>
+
+{#if toast}
+  <div class="card preset-filled-surface-100-900 fixed right-4 bottom-16 p-4 shadow-xl" role="status" aria-live="polite">
+    <span class="text-xs opacity-60">From Go</span>
+    <p aria-label="result">{toast}</p>
+  </div>
+{/if}
